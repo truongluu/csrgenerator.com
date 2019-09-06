@@ -39,7 +39,7 @@ class GenerationTests(unittest.TestCase):
 
     def test_csr_length(self):
         csr = CsrGenerator(self.csr_info)
-        assert_equal(len(csr.csr), 1029)
+        assert_equal(len(csr.csr), 1106)
 
     def test_csr_starts_with(self):
         csr = CsrGenerator(self.csr_info)
@@ -61,6 +61,20 @@ class GenerationTests(unittest.TestCase):
         self.assertTrue(csr.private_key.endswith(b'-----END RSA PRIVATE KEY-----\n') or
                         csr.private_key.endswith(b'-----END PRIVATE KEY-----\n'))
 
+    def test_subject_alt_names(self):
+        self.csr_info['subjectAltNames'] = "www.example.com,*.example.com"
+        csr = CsrGenerator(self.csr_info)
+        self.assertEqual(
+            sorted(csr.subjectAltNames),
+            sorted(["DNS:example.com", "DNS:www.example.com", "DNS:*.example.com"])
+        )
+
+    def test_default_subject_alt_name(self):
+        csr = CsrGenerator(self.csr_info)
+        self.assertEqual(
+            csr.subjectAltNames,
+            ["DNS:example.com", "DNS:www.example.com"]
+        )
 
 class ExceptionTests(unittest.TestCase):
     @raises(KeyError)
