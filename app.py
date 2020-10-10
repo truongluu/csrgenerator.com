@@ -2,7 +2,7 @@
 
 import os
 
-from flask import Flask, request, Response, render_template
+from flask import Flask, request, Response, render_template, jsonify
 
 from csr import CsrGenerator
 
@@ -22,8 +22,7 @@ def security():
 @app.route('/generate', methods=['POST'])
 def generate_csr():
     csr = CsrGenerator(request.form)
-    response = b'\n'.join([csr.csr, csr.private_key])
-    return Response(response, mimetype='text/plain')
+    return jsonify({"csr": csr.csr.decode('utf-8'), "private_key": csr.private_key.decode('utf-8')})
 
 
 if __name__ == '__main__':
